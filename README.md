@@ -4,7 +4,10 @@ Do you like [Shapeless](https://github.com/milessabin/shapeless), this great API
 
 Do you like [Play-json](https://github.com/mandubian/play-json-alone), the Play Json 2.1 Json API developed for Play 2.1 framework providing functional & typesafe Json validation and Scala conversion?
 
-Here is **Shapelaysson** an API interleaving Play-Json with Shapeless to be able to **manipulate Json from/to Shapeless HList**
+Here is **Shapelaysson** an API interleaving Play-Json with Shapeless to be able to **manipulate Json from/to Shapeless HList heterogenous lists** (_HList are polymorphic lists able to contain different types of data and able to keep tracks of these types_)
+
+
+> `Shapelaysson` takes part in my reflexions around manipulating pure data structures from/to JSON.
 
 ## A few pure Json from/to HList samples
 
