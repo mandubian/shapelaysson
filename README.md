@@ -17,11 +17,13 @@ import shapelaysson._
 
 // validates + converts a JsArray into HList
 scala> Json.arr("foo", 123L).validate[ String :: Long :: HNil ]
-res1: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[Long,shapeless.HNil]]] = JsSuccess(foo :: 123 :: HNil,)
+res1: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[Long,shapeless.HNil]]] = 
+JsSuccess(foo :: 123 :: HNil,)
 
 // validates + converts a JsObject into HList
 scala> Json.obj("foo" -> "toto", "bar" -> 123L).validate[ String :: Long :: HNil ]
-res3: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[Long,shapeless.HNil]]] = JsSuccess(toto :: 123 :: HNil,)
+res3: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[Long,shapeless.HNil]]] = 
+JsSuccess(toto :: 123 :: HNil,)
 
 // validates + converts imbricated JsObject into HList
 scala> Json.obj(
@@ -30,7 +32,8 @@ scala> Json.obj(
      |      "bar" -> 123L,
      |      "barbar" -> Json.arr(123, true, "blabla")
      |   ).validate[ String :: (Float :: String :: HNil) :: Long :: (Int :: Boolean :: String :: HNil) :: HNil ]
-res4: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[shapeless.::[Float,shapeless.::[String,shapeless.HNil]],shapeless.::[Long,shapeless.::[shapeless.::[Int,shapeless.::[Boolean,shapeless.::[String,shapeless.HNil]]],shapeless.HNil]]]]] = JsSuccess(toto :: 123.45 :: tutu :: HNil :: 123 :: 123 :: true :: blabla :: HNil :: HNil,)
+res4: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[shapeless.::[Float,shapeless.::[String,shapeless.HNil]],shapeless.::[Long,shapeless.::[shapeless.::[Int,shapeless.::[Boolean,shapeless.::[String,shapeless.HNil]]],shapeless.HNil]]]]] = 
+JsSuccess(toto :: 123.45 :: tutu :: HNil :: 123 :: 123 :: true :: blabla :: HNil :: HNil,)
 
 // validates with ERROR JsArray into HList
 scala> Json.arr("foo", 123L).validate[ Long :: Long :: HNil ] must beEqualTo( JsError("validate.error.expected.jsnumber") )
@@ -61,7 +64,7 @@ scala> val HListReads2 = (
      | ).tupled.hlisted
 HListReads2: play.api.libs.json.Reads[shapeless.::[String,shapeless.::[Long,shapeless.::[shapeless.::[String,shapeless.::[Boolean,shapeless.HNil]],shapeless.HNil]]]] = play.api.libs.json.Reads$$anon$8@7e4a09ee
 
-// validates/converts JsObjet to HList
+// validates/converts JsObject to HList
 scala> Json.obj(
      |   "foo" -> "toto", 
      |   "bar" -> 123L,
@@ -70,7 +73,8 @@ scala> Json.obj(
      |      "beta" -> true
      |   )
      | ).validate(HListReads2)
-res7: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[Long,shapeless.::[shapeless.::[String,shapeless.::[Boolean,shapeless.HNil]],shapeless.HNil]]]] = JsSuccess(toto :: 123 :: chboing :: true :: HNil :: HNil,)
+res7: play.api.libs.json.JsResult[shapeless.::[String,shapeless.::[Long,shapeless.::[shapeless.::[String,shapeless.::[Boolean,shapeless.HNil]],shapeless.HNil]]]] = 
+JsSuccess(toto :: 123 :: chboing :: true :: HNil :: HNil,)
 
 // Create a Writes[String :: Long :: HNil]
 scala> implicit val HListWrites: Writes[ String :: Long :: HNil ] = (
