@@ -43,28 +43,29 @@ package object `shapelaysson` {
     case _                                    => JsError("Not empty JsArray or JsObject")
   } }
 
-  implicit def hlistHNilReads[H : Reads](implicit applicative: Applicative[JsResult]) = Reads[H :: HNil]{ js =>       
+  /*implicit def hlistHNilReads[H : Reads](implicit applicative: Applicative[JsResult]) = Reads[H :: HNil]{ js =>       
     js match {
       case arr: JsArray   => toHList[H, HNil](arr.value.toList)
       case obj: JsObject  => toHList[H, HNil](obj.values.toList)
       case js             => implicitly[Reads[H]].reads(js) map { h => h :: HNil }
     }
-  }
+  }*/
 
   implicit def hlistReads[H : Reads, T <: HList : Reads](implicit applicative: Applicative[JsResult]) = Reads[H :: T]{ js =>       
     js match {
       case arr: JsArray   => toHList[H, T](arr.value.toList)
       case obj: JsObject  => toHList[H, T](obj.values.toList)
-      case js             => JsError("Single JsValue can't be mapped to multi-element HList")
+      case js             => toHList[H, T](List(js))
+      //JsError("Single JsValue can't be mapped to multi-element HList")
     }
   }
 
   implicit def HNilWrites = Writes[HNil]{ hl => JsArray() }
 
-  implicit def hlistHNilWrites[H : Writes] = Writes[H :: HNil]{ hl => 
+  /*implicit def hlistHNilWrites[H : Writes] = Writes[H :: HNil]{ hl => 
     val head :: HNil = hl
     JsArray(Seq(implicitly[Writes[H]].writes(head)))
-  }
+  }*/
 
   implicit def hlistWrites[H : Writes, T <: HList : Writes] = Writes[H :: T]{ hl => 
     val head :: tail = hl
@@ -78,6 +79,12 @@ package object `shapelaysson` {
   implicit class TupleWritesOps[ P <: Product ](w: Writes[P]) {    
     def contramap[A, B](wa:Writes[A], f: B => A): Writes[B] = Writes[B]( b => wa.writes(f(b)) )
     def hlisted[T <: HList](implicit hlister : HLister[P], tupler: TuplerAux[T, P]) = contramap(w, (hl: T) => hl.tupled)
+  }
+
+  def JsArrayIso[L <: HList](implicit r: Reads[L], w: Writes[L]) = new Iso[JsArray, L] {
+    def to(t: JsArray): L = r.reads(t).get
+    
+    def from(l: L): JsArray = w.writes(l).asInstanceOf[JsArray]
   }
 
 }

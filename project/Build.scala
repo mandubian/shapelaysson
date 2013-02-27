@@ -41,7 +41,12 @@ object ApplicationBuild extends Build {
         if(version.trim.endsWith("SNAPSHOT"))
           Some(Resolver.file("snapshots", new File(localPublishRepo + "/snapshots")))
         else Some(Resolver.file("releases", new File(localPublishRepo + "/releases")))
-      }
+      },
+      scalacOptions ++= Seq(
+        //"-Xlog-implicits"
+        //"-deprecation",
+        //"-feature"
+      )
     )
   )
 }

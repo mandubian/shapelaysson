@@ -24,16 +24,16 @@ import play.api.libs.json._
 import play.api.libs.functional._
 import play.api.libs.functional.syntax._
 
-import shapeless._
-import HList._
-import Tuples._
-import shapelaysson._
 
 class JsonTestSpec extends Specification {
 
   "shapelaysson" should {
     
     "validate lots of stuff" in {
+      import shapeless._
+      import HList._
+      import Tuples._
+      import shapelaysson._
 
       Json.obj().validate[ HNil ].get must beEqualTo( HNil )
       Json.arr().validate[ HNil ].get must beEqualTo( HNil )
@@ -58,9 +58,16 @@ class JsonTestSpec extends Specification {
         "toto" :: (123.45F :: "tutu" :: HNil) :: 123L :: (123 :: true :: "blabla" :: HNil) :: HNil
       )
 
+      Json.toJson(123.45F :: "tutu" :: HNil) must beEqualTo(Json.arr(123.45F, "tutu"))
+
     }
 
     "transform Reads[Product] to Reads[HList]" in {
+      import shapeless._
+      import HList._
+      import Tuples._
+      import shapelaysson._
+
       val HListReads: Reads[ String :: Long :: HNil ] = (
         (__ \ "foo").read[String] and
         (__ \ "bar").read[Long]
@@ -93,6 +100,11 @@ class JsonTestSpec extends Specification {
     }
 
     "transform Writes[Product] to Writes[HList]" in {
+      import shapeless._
+      import HList._
+      import Tuples._
+      import shapelaysson._
+
       implicit val HListWrites: Writes[ String :: Long :: HNil ] = (
         (__ \ "foo").write[String] and
         (__ \ "bar").write[Long]
@@ -125,6 +137,28 @@ class JsonTestSpec extends Specification {
         )
     }
 
+    "use Iso[JsArray, L <: HList]" in {
+      import shapeless._
+      import Lens._
+      import Nat._
+      import shapelaysson._
+
+      val arr = Json.arr(123L, "toto")
+
+      implicit val iso = JsArrayIso[ Long :: String :: HNil ]
+
+      iso.from(iso.to(arr)) must beEqualTo(arr)
+
+      val firstLens = Lens[JsArray] >> _0
+      val secondLens = Lens[JsArray] >> _1
+
+      firstLens.get(arr) must beEqualTo(123L)
+      secondLens.get(arr) must beEqualTo("toto")
+
+      firstLens.set(arr)(1234L) must beEqualTo( Json.arr(1234L, "toto") )
+      secondLens.set(arr)("tutu") must beEqualTo( Json.arr(123L, "tutu") )
+      (firstLens ~ secondLens).set(arr)(12345L -> "tata") must beEqualTo( Json.arr(12345L, "tata") )
+    }
   }
 
 }
